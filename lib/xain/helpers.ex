@@ -1,14 +1,20 @@
 defmodule Xain.Helpers do
   require Logger
 
-  def ensure_valid_contents(contents, _) when is_binary(contents) or is_list(contents) do
+  def ensure_valid_contents({:safe, payload} = contents, _) do
     contents
+  end
+  def ensure_valid_contents(contents, _) when is_binary(contents) do
+    Phoenix.HTML.html_escape(contents)
+  end
+  def ensure_valid_contents(contents, _) when is_list(contents) do
+    Enum.map(contents, &(ensure_valid_contents(&1, :list_item)))
   end
   def ensure_valid_contents(contents, tag_name) do
     Logger.debug "#{tag_name} has been called as #{tag_name}(#{inspect(contents)}, ...), but the first argument supposed to be a binary"
-    to_string(contents)
+    Phoenix.HTML.html_escape(to_string(contents))
   end
-  
+
   def id_and_class_shortcuts(contents, attrs) when is_binary(contents) do
     tokenize(contents) |> _id_and_class_shortcuts(attrs)
   end
@@ -18,19 +24,19 @@ defmodule Xain.Helpers do
 
   defp _id_and_class_shortcuts([h | t], attrs) do
     case h do
-      "#" <> id -> 
+      "#" <> id ->
         id = String.strip(id)
         _id_and_class_shortcuts(t, merge_id_or_class(:id, id, attrs))
-        
-      "." <> class -> 
+
+      "." <> class ->
         class = String.strip(class)
         _id_and_class_shortcuts(t, merge_id_or_class(:class, class, attrs))
 
-      # "%" <> name -> 
+      # "%" <> name ->
       #   name = String.strip(name)
       #   _id_and_class_shortcuts(t, struct(tag, name: String.to_atom(name)))
 
-      contents -> 
+      contents ->
         {contents, attrs}
     end
   end
@@ -41,9 +47,9 @@ defmodule Xain.Helpers do
 
   defp merge_id_or_class(:class, item, attrs) do
     case Keyword.get(attrs, :class, "") do
-      "" -> 
+      "" ->
         Keyword.put(attrs, :class, item)
-      other -> 
+      other ->
         Keyword.put(attrs, :class, other <> " " <> item)
     end
   end

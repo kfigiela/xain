@@ -75,20 +75,37 @@ defmodule Xain do
 
   def join(list) do
     list
-    |> Enum.map(&item_to_string/1)
     |> Enum.filter(&(&1))
-    |> Enum.reverse
-    |> Enum.join
+    |> Enum.map(&item_to_string/1)
+    |> Enum.reverse()
+    |> safe_join()
   end
 
   defp item_to_string(item) when is_list(item) do
-    item |> Enum.map(&item_to_string/1) |> Enum.filter(&(&1)) |> Enum.join
+    item
+    |> Enum.filter(&(&1))
+    |> Enum.map(&item_to_string/1)
+    |> safe_join()
   end
   defp item_to_string(item) when is_binary(item) do
+    Phoenix.HTML.html_escape(item)
+  end
+  defp item_to_string({:safe, _} = item) do
     item
   end
-  defp item_to_string(_) do
+  defp item_to_string(wtf) do
+    Apex.ap("WTFFF!!!!!!!!!!!!!!!!!!!!!!!")
+    Apex.ap(wtf)
     false
+  end
+
+  defp safe_join(list) do
+    {:safe,
+      Enum.map(list, fn
+        {:safe, safe_data} -> safe_data
+        non_safe -> Phoenix.HTML.html_escape(non_safe)
+      end)
+    }
   end
 
   defp handle_inner_list(list, acc \\ [])
@@ -108,41 +125,28 @@ defmodule Xain do
     end
   end
 
-  def build_tag(name, attrs, _, inner, sc) when is_list(attrs) do
-    build_tag(name, "", attrs, inner, sc)
-  end
   def build_tag(name, inline_content, attrs, inner, sc) do
-    inline_content
-    |> ensure_valid_contents(name)
-    |> merge_attrs(attrs, name)
-    |> merge_content(inner)
-    |> wrap_in_tags(name, sc)
-  end
-
-
-  defp merge_attrs(content, attrs, tag_name) do
-    attrs = attrs |> set_defaults(tag_name)
-    {content, attrs} = id_and_class_shortcuts(content, attrs)
-    attrs_html = for {key, val} <- attrs, into: "", do: " #{key}=#{quote_symbol}#{val}#{quote_symbol}"
-    {content, attrs_html}
-  end
-
-  defp merge_content({inline_content, attrs_html}, inner) do
-    inner_content = cond do
-      is_list(inner) -> Enum.join(inner)
-      is_binary(inner) -> inner
-      true -> ""
+    attrs = attrs |> set_defaults(name)
+    {inline_content_no_attrs, all_attrs} = case inline_content do
+      {:safe, _} = data -> {data, attrs}
+      inline_content -> id_and_class_shortcuts(inline_content, attrs)
     end
-    {inline_content <> inner_content, attrs_html}
+
+    if sc do
+      Phoenix.HTML.Tag.tag(name, all_attrs)
+    else
+      safe_inline_content = inline_content_no_attrs |> ensure_valid_contents(name)
+      safe_inner          = inner                   |> ensure_valid_contents("inner")
+      safe_content = merge_content(safe_inline_content, safe_inner)
+      Phoenix.HTML.Tag.content_tag(name, safe_content , all_attrs)
+    end
   end
 
-  defp wrap_in_tags({_content, attrs_html}, name, true) do
-    "<#{name}#{attrs_html}/>"
+  def merge_content(s1, s2) do
+    {:safe, s1} = Phoenix.HTML.html_escape(s1)
+    {:safe, s2} = Phoenix.HTML.html_escape(s2)
+    {:safe, [s1, s2]}
   end
-  defp wrap_in_tags({content, attrs_html}, name, false) do
-    "<#{name}#{attrs_html}>#{content}</#{name}>"
-  end
-
 
   defmacro markup(opts \\ [], block)
   defmacro markup(:nested, do: block) do
