@@ -16,6 +16,9 @@ defmodule Xain.Helpers do
   def ensure_valid_contents(contents) when is_integer(contents) do
     Phoenix.HTML.html_escape([contents])
   end
+  def ensure_valid_contents(nil) do
+    {:safe, []}
+  end
   def ensure_valid_contents(contents) do
     Logger.debug "ensure_valid_contents has been called as (#{inspect(contents)}, ...), but the first argument is not expected type"
     Phoenix.HTML.html_escape(to_string(contents))
