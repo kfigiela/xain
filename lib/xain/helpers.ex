@@ -1,7 +1,7 @@
 defmodule Xain.Helpers do
   require Logger
 
-  def ensure_valid_contents({:safe, payload} = contents) do
+  def ensure_valid_contents({:safe, _payload} = contents) do
     contents
   end
   def ensure_valid_contents(contents) when is_binary(contents) do
@@ -9,12 +9,15 @@ defmodule Xain.Helpers do
   end
   def ensure_valid_contents(contents) when is_list(contents) do
     data = contents
-        |> Enum.map(&(ensure_valid_contents(&1)))
+        |> Enum.map(fn x ->
+          if is_integer(x) do
+            Phoenix.HTML.html_escape([x])
+          else
+            ensure_valid_contents(x)
+          end
+        end)
         |> Enum.map(fn {:safe, payload} -> payload end)
     {:safe, data}
-  end
-  def ensure_valid_contents(contents) when is_integer(contents) do
-    Phoenix.HTML.html_escape([contents])
   end
   def ensure_valid_contents(nil) do
     {:safe, []}
@@ -23,7 +26,6 @@ defmodule Xain.Helpers do
     Logger.debug "ensure_valid_contents has been called as (#{inspect(contents)}, ...), but the first argument is not expected type"
     Phoenix.HTML.html_escape(to_string(contents))
   end
-
   def id_and_class_shortcuts(contents, attrs) when is_binary(contents) do
     tokenize(contents) |> _id_and_class_shortcuts(attrs)
   end
