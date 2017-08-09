@@ -75,16 +75,16 @@ defmodule Xain do
 
   def join(list) do
     list
-    |> Enum.filter(&(&1))
     |> Enum.map(&item_to_string/1)
+    |> Enum.filter(&(&1))
     |> Enum.reverse()
     |> safe_join()
   end
 
   defp item_to_string(item) when is_list(item) do
     item
-    |> Enum.filter(&(&1))
     |> Enum.map(&item_to_string/1)
+    |> Enum.filter(&(&1))
     |> safe_join()
   end
   defp item_to_string(item) when is_binary(item) do
