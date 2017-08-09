@@ -190,9 +190,9 @@ defmodule Xain do
   defmacro raw(string) do
     quote do
       str = case unquote(string) do
-        string when is_binary(string) -> string
-        {:safe, list} -> List.to_string list
-        other -> to_string other
+        string when is_binary(string) -> Phoenix.HTML.raw(string)
+        {:safe, _} = data -> data
+        other -> Phoenix.HTML.raw(to_string(other))
       end
     end
   end
