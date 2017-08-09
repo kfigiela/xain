@@ -17,7 +17,7 @@ defmodule Xain.HelpersTest do
     attrs = [class: "cls"]
     assert id_and_class_shortcuts("test", attrs) == {"test", attrs}
   end
-  
+
   test "id_and_class_shortcuts #id" do
     assert id_and_class_shortcuts("#test", []) == {"", [id: "test"]}
   end
@@ -32,34 +32,34 @@ defmodule Xain.HelpersTest do
   end
 
   test "ensure_valid_contents doesn't affect binaries and lists" do
-    assert ensure_valid_contents("test", :p) == "test"
-    assert ensure_valid_contents('test', :p) == 'test'
-    assert ensure_valid_contents(["1", "2", "3"], :p) == ["1", "2", "3"]
+    assert ensure_valid_contents("test") == "test"
+    assert ensure_valid_contents('test') == 'test'
+    assert ensure_valid_contents(["1", "2", "3"]) == ["1", "2", "3"]
   end
 
   @log_msg "the first argument supposed to be a binary"
   test "ensure_valid_contents calls to_string for numbers, booleans and atoms" do
     assert capture_log(fn ->
-      assert ensure_valid_contents(:test, :p) == "test"
+      assert ensure_valid_contents(:test) == "test"
     end) =~ @log_msg
     assert capture_log(fn ->
-      assert ensure_valid_contents(1, :p) == "1"
+      assert ensure_valid_contents(1) == "1"
     end) =~ @log_msg
     assert capture_log(fn ->
-      assert ensure_valid_contents(3.14, :p) == "3.14"
+      assert ensure_valid_contents(3.14) == "3.14"
     end) =~ @log_msg
     assert capture_log(fn ->
-      assert ensure_valid_contents(nil, :p) == ""
+      assert ensure_valid_contents(nil) == ""
     end) =~ @log_msg
     assert capture_log(fn ->
-      assert ensure_valid_contents(true, :p) == "true"
+      assert ensure_valid_contents(true) == "true"
     end) =~ @log_msg
   end
 
   test "ensure_valid_contents raises error if String.Chars is not implemented for the first argument" do
     assert capture_log(fn ->
       assert_raise Protocol.UndefinedError, "protocol String.Chars not implemented for %{}", fn ->
-        ensure_valid_contents(%{}, :p)
+        ensure_valid_contents(%{})
       end
     end) =~ @log_msg
   end
