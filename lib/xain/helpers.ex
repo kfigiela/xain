@@ -23,7 +23,6 @@ defmodule Xain.Helpers do
     {:safe, []}
   end
   def ensure_valid_contents(contents) do
-    Logger.debug "ensure_valid_contents has been called as (#{inspect(contents)}, ...), but the first argument is not expected type"
     Phoenix.HTML.html_escape(to_string(contents))
   end
   def id_and_class_shortcuts(contents, attrs) when is_binary(contents) do
