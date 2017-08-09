@@ -143,8 +143,8 @@ defmodule Xain do
   end
 
   def merge_content(s1, s2) do
-    s1 = Phoenix.HTML.html_escape_to_iodata(s1)
-    s2 = Phoenix.HTML.html_escape_to_iodata(s2)
+    {:safe, s1} = Phoenix.HTML.html_escape(s1)
+    {:safe, s2} = Phoenix.HTML.html_escape(s2)
     {:safe, [s1, s2]}
   end
 
