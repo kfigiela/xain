@@ -90,6 +90,7 @@ defmodule Xain do
   defp item_to_string(item) when is_binary(item) do
     Phoenix.HTML.html_escape(item)
   end
+  defp item_to_string(item) when is_boolean(item), do: false
   defp item_to_string({:safe, _} = item) do
     item
   end
@@ -131,7 +132,6 @@ defmodule Xain do
       {:safe, _} = data -> {data, attrs}
       inline_content -> id_and_class_shortcuts(inline_content, attrs)
     end
-
     if sc do
       Phoenix.HTML.Tag.tag(name, all_attrs)
     else

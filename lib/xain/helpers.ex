@@ -29,8 +29,9 @@ defmodule Xain.Helpers do
   def id_and_class_shortcuts(contents, attrs) when is_binary(contents) do
     tokenize(contents) |> _id_and_class_shortcuts(attrs)
   end
-  def id_and_class_shortcuts(attrs, _) when is_list(attrs), do: {"", attrs}
-
+  def id_and_class_shortcuts(contents, attrs) when is_list(contents) do
+    {"", Keyword.merge(attrs, contents)}
+end
   defp _id_and_class_shortcuts([], attrs), do: {"", attrs}
 
   defp _id_and_class_shortcuts([h | t], attrs) do
