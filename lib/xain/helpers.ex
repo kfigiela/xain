@@ -36,11 +36,11 @@ defmodule Xain.Helpers do
   defp _id_and_class_shortcuts([h | t], attrs) do
     case h do
       "#" <> id ->
-        id = String.strip(id)
+        id = String.trim(id)
         _id_and_class_shortcuts(t, merge_id_or_class(:id, id, attrs))
 
       "." <> class ->
-        class = String.strip(class)
+        class = String.trim(class)
         _id_and_class_shortcuts(t, merge_id_or_class(:class, class, attrs))
 
       # "%" <> name ->
@@ -70,13 +70,8 @@ defmodule Xain.Helpers do
 
   @regex        ~r/(?:#{@tag_class_id}|#{@rest})\s*/s
 
-
   defp tokenize(string) do
-    Regex.scan(@regex, string, trim: true) |> reduce
-  end
-
-  defp reduce([]), do: []
-  defp reduce([h|t]) do
-    [List.foldr(h, "", fn(x, _acc) -> x end) | reduce(t)]
+    Regex.scan(@regex, string, trim: true)
+      |> Enum.map(fn [h | _t] -> h end)
   end
 end
