@@ -1,17 +1,23 @@
 defmodule Xain.Helpers do
   require Logger
 
-  def ensure_valid_contents({:safe, payload} = contents, _) do
+  def ensure_valid_contents({:safe, payload} = contents) do
     contents
   end
-  def ensure_valid_contents(contents, _) when is_binary(contents) do
+  def ensure_valid_contents(contents) when is_binary(contents) do
     Phoenix.HTML.html_escape(contents)
   end
-  def ensure_valid_contents(contents, _) when is_list(contents) do
-    Enum.map(contents, &(ensure_valid_contents(&1, :list_item)))
+  def ensure_valid_contents(contents) when is_list(contents) do
+    data = contents
+        |> Enum.map(&(ensure_valid_contents(&1)))
+        |> Enum.map(fn {:safe, payload} -> payload end)
+    {:safe, data}
   end
-  def ensure_valid_contents(contents, tag_name) do
-    Logger.debug "#{tag_name} has been called as #{tag_name}(#{inspect(contents)}, ...), but the first argument supposed to be a binary"
+  def ensure_valid_contents(contents) when is_integer(contents) do
+    Phoenix.HTML.html_escape([contents])
+  end
+  def ensure_valid_contents(contents) do
+    Logger.debug "ensure_valid_contents has been called as (#{inspect(contents)}, ...), but the first argument is not expected type"
     Phoenix.HTML.html_escape(to_string(contents))
   end
 

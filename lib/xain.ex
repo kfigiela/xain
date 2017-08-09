@@ -135,8 +135,8 @@ defmodule Xain do
     if sc do
       Phoenix.HTML.Tag.tag(name, all_attrs)
     else
-      safe_inline_content = inline_content_no_attrs |> ensure_valid_contents(name)
-      safe_inner          = inner                   |> ensure_valid_contents("inner")
+      safe_inline_content = inline_content_no_attrs |> ensure_valid_contents()
+      safe_inner          = inner                   |> ensure_valid_contents()
       safe_content = merge_content(safe_inline_content, safe_inner)
       Phoenix.HTML.Tag.content_tag(name, safe_content , all_attrs)
     end
