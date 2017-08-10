@@ -130,6 +130,7 @@ defmodule Xain do
     attrs = attrs |> set_defaults(name)
     {inline_content_no_attrs, all_attrs} = case inline_content do
       {:safe, _} = data -> {data, attrs}
+      nil -> {"", attrs}
       inline_content -> id_and_class_shortcuts(inline_content, attrs)
     end
     if sc do
