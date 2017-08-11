@@ -1,6 +1,5 @@
 defmodule Xain.HelpersTest do
   use ExUnit.Case
-  import Xain.Case
   import Xain.Helpers
   alias Phoenix.HTML, as: P
 
@@ -37,30 +36,16 @@ defmodule Xain.HelpersTest do
     assert ensure_valid_contents(["1", "2", "3"]) |> P.safe_to_string() == "123"
   end
 
-  @log_msg "first argument is not expected type"
   test "ensure_valid_contents calls to_string for numbers, booleans and atoms" do
-    assert capture_log(fn ->
-      assert ensure_valid_contents(nil)   |> P.safe_to_string() == ""
-    end) == ""
-    assert capture_log(fn ->
-      assert ensure_valid_contents(:test) |> P.safe_to_string() == "test"
-    end) =~ @log_msg
-    assert capture_log(fn ->
-      assert ensure_valid_contents(1)     |> P.safe_to_string() == "1"
-    end) =~ @log_msg
-    assert capture_log(fn ->
-      assert ensure_valid_contents(3.14)  |> P.safe_to_string() == "3.14"
-    end) =~ @log_msg
-    assert capture_log(fn ->
-      assert ensure_valid_contents(true)  |> P.safe_to_string() == "true"
-    end) =~ @log_msg
+    assert ensure_valid_contents(nil)   |> P.safe_to_string() == ""
+    assert ensure_valid_contents(:test) |> P.safe_to_string() == "test"
+    assert ensure_valid_contents(1)     |> P.safe_to_string() == "1"
+    assert ensure_valid_contents(3.14)  |> P.safe_to_string() == "3.14"
+    assert ensure_valid_contents(true)  |> P.safe_to_string() == "true"
   end
 
   test "ensure_valid_contents raises error if String.Chars is not implemented for the first argument" do
-    assert capture_log(fn ->
-      assert_raise Protocol.UndefinedError, ~r"protocol String\.Chars not implemented for %{}",
-        fn -> ensure_valid_contents(%{})
-      end
-    end) =~ @log_msg
+    assert_raise Protocol.UndefinedError, ~r"protocol String\.Chars not implemented for %{}",
+      fn -> ensure_valid_contents(%{}) end
   end
 end
