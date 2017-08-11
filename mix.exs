@@ -8,7 +8,7 @@ defmodule Xain.Mixfile do
      version: @version,
      elixir: "~> 1.0",
      package: package(),
-     deps: [{:phoenix_html, "~> 2.10"}, {:apex, "~> 1.0"}],
+     deps: [{:phoenix_html, "~> 2.10"}],
      description: """
      An html DSL package.
      """
