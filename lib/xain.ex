@@ -94,9 +94,11 @@ defmodule Xain do
   defp item_to_string({:safe, _} = item) do
     item
   end
+  defp item_to_string(nil) do
+    false
+  end
   defp item_to_string(wtf) do
-    Apex.ap("WTFFF!!!!!!!!!!!!!!!!!!!!!!!")
-    Apex.ap(wtf)
+    Logger.debug("Xain: Unexpected data: #{inspect(wtf)}")
     false
   end
 
